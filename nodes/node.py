@@ -16,6 +16,8 @@ class NodeServer:
         self.leader_id = None
         self.lock = threading.Lock()
 
+        self.consistency_mode = "eventual"
+
     # ---------------- CLIENT HANDLING ---------------- #
 
     def handle_client(self, client_socket):
@@ -40,6 +42,19 @@ class NodeServer:
         if action == "LEADER":
             return f"LEADER {self.leader_id}\n"
 
+        if action == "CONSISTENCY" and len(parts) == 2:
+            mode = parts[1].lower()
+            if mode in ["strong", "eventual"]:
+                self.consistency_mode = mode
+                return f"OK: consistency set to {mode}\n"
+            return "ERROR: invalid consistency mode\n"
+
+        if action == "REPL_SET":
+            key, value = parts[1], parts[2]
+            with self.lock:
+                self.data_store[key] = value
+            return "ACK\n"
+
         if action == "SET":
             if self.node_id != self.leader_id:
                 return self.forward_to_leader(command)
@@ -55,14 +70,16 @@ class NodeServer:
         return "ERROR: Invalid command\n"
 
     def handle_set(self, parts):
-        if len(parts) != 3:
-            return "ERROR: Invalid SET\n"
-
         key, value = parts[1], parts[2]
+
         with self.lock:
             self.data_store[key] = value
 
-        self.replicate_to_peers(key, value)
+        success = self.replicate_to_peers(key, value)
+
+        if self.consistency_mode == "strong" and not success:
+            return "FAIL: quorum not reached\n"
+
         return f"OK: {key} set by leader {self.node_id}\n"
 
     def forward_to_leader(self, command):
@@ -80,6 +97,9 @@ class NodeServer:
     # ---------------- REPLICATION ---------------- #
 
     def replicate_to_peers(self, key, value):
+        acks = 1  # leader
+        required = (len(self.peers) + 1) // 2 + 1
+
         for peer in self.peers:
             if not self.peer_status.get(peer, False):
                 continue
@@ -87,20 +107,29 @@ class NodeServer:
                 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                 sock.settimeout(2)
                 sock.connect(peer)
-                sock.sendall(f"SET {key} {value}".encode())
+                sock.sendall(f"REPL_SET {key} {value}".encode())
+                resp = sock.recv(1024).decode()
                 sock.close()
+
+                if resp.startswith("ACK"):
+                    acks += 1
             except:
-                self.peer_status[peer] = False
+                pass  # heartbeat handles liveness
+
+        if self.consistency_mode == "strong":
+            return acks >= required
+
+        return True
 
     # ---------------- LEADER ELECTION ---------------- #
 
     def elect_leader(self):
-        alive_nodes = [self.node_id]
-        for peer, alive in self.peer_status.items():
-            if alive:
-                alive_nodes.append(peer[1])
+        alive = [self.node_id]
+        for peer, ok in self.peer_status.items():
+            if ok:
+                alive.append(peer[1])
 
-        new_leader = max(alive_nodes)
+        new_leader = max(alive)
         if new_leader != self.leader_id:
             print(f"[ELECTION] New leader elected: {new_leader}")
         self.leader_id = new_leader
@@ -108,7 +137,6 @@ class NodeServer:
     def get_leader_address(self):
         if self.leader_id == self.node_id:
             return (self.host, self.port)
-
         for peer in self.peers:
             if peer[1] == self.leader_id:
                 return peer
@@ -126,8 +154,13 @@ class NodeServer:
                     sock.sendall(b"PING")
                     sock.recv(1024)
                     sock.close()
+
+                    if not self.peer_status.get(peer, True):
+                        print(f"[RECOVERED] Peer {peer} is back UP")
                     self.peer_status[peer] = True
                 except:
+                    if self.peer_status.get(peer, True):
+                        print(f"[FAILURE] Peer {peer} is DOWN")
                     self.peer_status[peer] = False
 
             self.elect_leader()
@@ -143,15 +176,14 @@ class NodeServer:
         print(f"[NodeSync] Node {self.node_id} running on {self.host}:{self.port}")
         print(f"[NodeSync] Peers: {self.peers}")
 
-        heartbeat = threading.Thread(
+        threading.Thread(
             target=self.heartbeat_monitor, daemon=True
-        )
-        heartbeat.start()
+        ).start()
 
         while True:
-            client_socket, _ = server.accept()
+            client, _ = server.accept()
             threading.Thread(
-                target=self.handle_client, args=(client_socket,)
+                target=self.handle_client, args=(client,), daemon=True
             ).start()
 
 
@@ -159,10 +191,8 @@ if __name__ == "__main__":
     port = int(sys.argv[1])
     peers = []
 
-    if len(sys.argv) > 2:
-        for peer in sys.argv[2:]:
-            host, p = peer.split(":")
-            peers.append((host, int(p)))
+    for peer in sys.argv[2:]:
+        h, p = peer.split(":")
+        peers.append((h, int(p)))
 
-    node = NodeServer(port=port, peers=peers)
-    node.start()
+    NodeServer(port=port, peers=peers).start()

@@ -62,7 +62,7 @@ The node with the highest port becomes leader.
 ## 🧪 Client Interaction (PowerShell Example)
 
 ```
-$client = New-Object System.Net.Sockets.TcpClient("127.0.0.1", 5000)
+$client = New-Object System.Net.Sockets.TcpClient("127.0.0.1", 5002)
 $stream = $client.GetStream()
 $writer = New-Object System.IO.StreamWriter($stream)
 $reader = New-Object System.IO.StreamReader($stream)
@@ -81,9 +81,38 @@ $reader.ReadLine()
  2. Remaining nodes elect a new leader automatically
  3. Writes continue without downtime
 
+## 📊 Performance Benchmarking
+
+NodeSync was benchmarked under both eventual and strong consistency modes.
+
+Results show that quorum-based strong consistency increases write latency due to replica acknowledgements, while eventual consistency provides lower latency.
+
+Detailed results are available in `benchmark/RESULTS.md`.
+
+### CLI Results:
+
+```
+python benchmark/benchmark.py
+```
+
+```
+[Benchmark] Running Eventual Consistency test...
+[Benchmark] Running Strong Consistency test...
+
+======== RESULTS ========
+
+Eventual Consistency:
+  Avg latency: 0.0139s
+  Max latency: 0.0371s
+
+Strong Consistency:
+  Avg latency: 0.0153s
+  Max latency: 0.0429s
+```
+
 ---
 
-## 🧠 Key Distributed Systems Concepts Demonstrated
+## 🧠 Distributed Systems: Key Concepts Demonstrated
 
 - Replication
 - Leader election
