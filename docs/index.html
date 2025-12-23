@@ -217,6 +217,13 @@ Replication
 
 <section>
     <h2>🚀 Running the System</h2>
+
+    <p>Each node runs as an independent process.</p>
+    <ul>
+        <li>The first argument is the node's port (used as its ID)</li>
+        <li>Remaining arguments are peer addresses</li>
+    </ul>
+
     <h3>Start 3 nodes (example)</h3>
 
     <pre><code>python nodes/node.py 5000 127.0.0.1:5001 127.0.0.1:5002
