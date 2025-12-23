@@ -62,9 +62,9 @@ python nodes/node.py 5002 127.0.0.1:5000 127.0.0.1:5001
 The node with the highest port becomes leader.
 
 ```
-[NodeSync] Node 5002 running on 127.0.0.1:5002
-[NodeSync] Peers: [('127.0.0.1', 5000), ('127.0.0.1', 5001)]
-[ELECTION] New leader elected: 5002
+16:55:49 [NodeSync  ] Node 5000 running on 127.0.0.1:5000
+16:55:49 [NodeSync  ] Peers: [('127.0.0.1', 5001), ('127.0.0.1', 5002)]
+16:55:49 [ELECTION  ] New leader elected: 5002
 ```
 
 ## 🧪 Client Interaction (PowerShell Example)

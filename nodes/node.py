@@ -18,6 +18,12 @@ class NodeServer:
 
         self.consistency_mode = "eventual"
 
+    # ---------------- LOGGING ---------------- #
+
+    def log(self, tag, message):
+        timestamp = time.strftime("%H:%M:%S")
+        print(f"{timestamp} [{'{}'.format(tag):<10}] {message}")
+
     # ---------------- CLIENT HANDLING ---------------- #
 
     def handle_client(self, client_socket):
@@ -131,7 +137,7 @@ class NodeServer:
 
         new_leader = max(alive)
         if new_leader != self.leader_id:
-            print(f"[{'ELECTION':<10}] New leader elected: {new_leader}")
+            self.log("ELECTION", f"New leader elected: {new_leader}")
         self.leader_id = new_leader
 
     def get_leader_address(self):
@@ -156,11 +162,11 @@ class NodeServer:
                     sock.close()
 
                     if not self.peer_status.get(peer, True):
-                        print(f"[{'RECOVERED':<10}] Peer {peer} is back UP")
+                        self.log("RECOVERED", f"Peer {peer} is back UP")
                     self.peer_status[peer] = True
                 except:
                     if self.peer_status.get(peer, True):
-                        print(f"[{'FAILURE':<10}] Peer {peer} is DOWN")
+                        self.log("FAILURE", f"Peer {peer} is DOWN")
                     self.peer_status[peer] = False
 
             self.elect_leader()
@@ -173,8 +179,8 @@ class NodeServer:
         server.bind((self.host, self.port))
         server.listen()
 
-        print(f"[{'NodeSync':<10}] Node {self.node_id} running on {self.host}:{self.port}")
-        print(f"[{'NodeSync':<10}] Peers: {self.peers}")
+        self.log("NodeSync", f"Node {self.node_id} running on {self.host}:{self.port}")
+        self.log("NodeSync", f"Peers: {self.peers}")
 
         threading.Thread(
             target=self.heartbeat_monitor, daemon=True
