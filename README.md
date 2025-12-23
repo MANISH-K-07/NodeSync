@@ -51,7 +51,7 @@ NodeSync/
 │   └── init.py
 ├── client/
 │ └── init.py
-├── main.py
+├── logs.md
 ├── README.md
 └── requirements.txt
 ```
