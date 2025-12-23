@@ -87,7 +87,7 @@ NodeSync was benchmarked under both eventual and strong consistency modes.
 
 Results show that quorum-based strong consistency increases write latency due to replica acknowledgements, while eventual consistency provides lower latency.
 
-Detailed results are available in `benchmark/RESULTS.md`.
+- Detailed observations & results are available in [benchmark/RESULTS.md](https://github.com/MANISH-K-07/NodeSync/blob/main/benchmark/RESULTS.md).
 
 ### CLI Results:
 
