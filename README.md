@@ -32,6 +32,8 @@ This project was built as a learning-oriented yet production-inspired system to 
 Leader election is deterministic:  
 ➡️ the alive node with the **highest port number** becomes leader.
 
+Read detailed **NodeSync Architecture** at [Architecture.md](https://github.com/MANISH-K-07/NodeSync/blob/main/Architecture.md)
+
 ## 📁 Project Structure
 
 ```
@@ -75,11 +77,48 @@ $writer.WriteLine("GET hello")
 $reader.ReadLine()
 ```
 
-## 🔥 Fault Tolerance Demo
+## 🔁 Consistency Modes
 
- 1. Kill the leader node
- 2. Remaining nodes elect a new leader automatically
- 3. Writes continue without downtime
+NodeSync supports **runtime-switchable consistency models**, allowing experimentation with CAP trade-offs.
+
+### Available Modes
+
+- **Eventual consistency** (default)  
+  - Writes are replicated asynchronously  
+  - Lower latency  
+  - Temporary inconsistencies may occur
+
+- **Strong consistency** (quorum-based)  
+  - Leader waits for acknowledgements from a majority of nodes  
+  - Higher latency  
+  - Linearizable writes as long as quorum is available
+
+### Switching Consistency at Runtime
+
+Consistency can be changed dynamically using a client command:
+
+```
+CONSISTENCY eventual
+CONSISTENCY strong
+```
+
+The consistency mode applies to the node receiving the command (typically the leader).
+
+### Example (PowerShell)
+
+```
+$writer.WriteLine("CONSISTENCY strong")
+$reader.ReadLine()
+
+$writer.WriteLine("SET key value")
+$reader.ReadLine()
+```
+
+If quorum cannot be reached in strong mode, the write fails with:
+```
+FAIL: quorum not reached
+```
+This enables direct comparison of consistency-performance trade-offs.
 
 ## 📊 Performance Benchmarking
 
@@ -109,6 +148,12 @@ Strong Consistency:
   Avg latency: 0.0153s
   Max latency: 0.0429s
 ```
+
+## 🔥 Fault Tolerance Demo
+
+ 1. Kill the leader node
+ 2. Remaining nodes elect a new leader automatically
+ 3. Writes continue without downtime
 
 ---
 
