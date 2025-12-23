@@ -224,6 +224,10 @@ python nodes/node.py 5001 127.0.0.1:5000 127.0.0.1:5002
 python nodes/node.py 5002 127.0.0.1:5000 127.0.0.1:5001</code></pre>
 
     <p>The node with the highest port becomes leader.</p>
+    <pre><code>[NodeSync] Node 5002 running on 127.0.0.1:5002
+[NodeSync] Peers: [('127.0.0.1', 5000), ('127.0.0.1', 5001)]
+[ELECTION] New leader elected: 5002</code></pre>
+
     <h3>🧪 Client Interaction (PowerShell Example)</h3>
     <pre><code>$client = New-Object System.Net.Sockets.TcpClient("127.0.0.1", 5002)
 $stream = $client.GetStream()
