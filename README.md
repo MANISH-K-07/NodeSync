@@ -60,6 +60,10 @@ NodeSync/
 
 ## 🚀 Running the System
 
+Each node runs as an independent process.
+- The first argument is the node's port (used as its ID)
+- Remaining arguments are peer addresses
+
 ### Start 3 nodes (example)
 
 ```
