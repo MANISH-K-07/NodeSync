@@ -4,6 +4,8 @@ NodeSync is a fault-tolerant distributed key-value store built in Python that de
 
 This project was built as a learning-oriented yet production-inspired system to explore how real-world distributed databases maintain availability and consistency under failures.
 
+- [NodeSync Logs](https://github.com/MANISH-K-07/NodeSync/blob/main/logs.md)
+
 ---
 
 ## ✨ Features
