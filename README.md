@@ -171,7 +171,6 @@ Strong Consistency:
 - Persistent write-ahead logs
 - Strong consistency using Raft log replication
 - Sharding and partitioning
-- Performance benchmarking and metrics
 - Client library abstraction
 
 ---

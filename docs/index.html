@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>NodeSync – Fault-tolerant distributed key-value store</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <style>
+        :root {
+            --bg-dark: #0f172a;
+            --bg-light: #f8fafc;
+            --text-main: #0f172a;
+            --text-muted: #475569;
+            --accent: #2563eb;
+        }
+
+        body {
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text-main);
+            line-height: 1.65;
+        }
+
+        /* ---------- HERO ---------- */
+        header {
+            background: radial-gradient(ellipse at top, #1e293b, #020617);
+            color: #ffffff;
+            padding: 90px 20px 80px;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 3rem;
+            margin-bottom: 12px;
+            letter-spacing: 0.5px;
+        }
+
+        header p {
+            max-width: 900px;
+            margin: auto;
+            font-size: 1.15rem;
+            color: #e5e7eb;
+        }
+
+        .badges {
+            margin-top: 28px;
+        }
+
+        .badge {
+            display: inline-block;
+            margin: 6px;
+            padding: 6px 14px;
+            border-radius: 999px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            background: rgba(255,255,255,0.08);
+            color: #e5e7eb;
+        }
+
+        .badge.blue { background: #2563eb; }
+        .badge.orange { background: #f97316; }
+        .badge.green { background: #16a34a; }
+
+        /* ---------- CONTENT ---------- */
+        main {
+            max-width: 1050px;
+            margin: auto;
+            padding: 60px 20px;
+        }
+
+        section {
+            margin-bottom: 70px;
+        }
+
+        h2 {
+            font-size: 1.9rem;
+            margin-bottom: 18px;
+            border-bottom: 2px solid #e5e7eb;
+            padding-bottom: 6px;
+        }
+
+        h3 {
+            margin-top: 30px;
+            font-size: 1.25rem;
+        }
+
+        p {
+            color: var(--text-muted);
+        }
+
+        ul {
+            padding-left: 20px;
+        }
+
+        li {
+            margin-bottom: 8px;
+        }
+
+        pre {
+            background: #020617;
+            color: #e5e7eb;
+            padding: 18px;
+            border-radius: 10px;
+            overflow-x: auto;
+            font-size: 0.95rem;
+        }
+
+        code {
+            font-family: "JetBrains Mono", Consolas, monospace;
+        }
+
+        .tree {
+            background: #f1f5f9;
+            padding: 18px;
+            border-radius: 10px;
+            font-family: monospace;
+            white-space: pre;
+            overflow-x: auto;
+        }
+
+        .image-box {
+            margin-top: 25px;
+            border-radius: 14px;
+            border: 1px solid #e5e7eb;
+            padding: 14px;
+            background: white;
+            text-align: center;
+        }
+
+        .links a {
+            display: inline-block;
+            margin-top: 16px;
+            text-decoration: none;
+            font-weight: 600;
+            color: var(--accent);
+        }
+
+        .nav {
+            margin-bottom: 30px;
+        }
+        .nav a {
+            margin-right: 20px;
+            font-weight: 500;
+        }
+
+        footer {
+            background: #020617;
+            color: #94a3b8;
+            text-align: center;
+            padding: 35px 20px;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>NodeSync</h1>
+    <p>
+        A fault-tolerant distributed key-value store built to explore 
+	replication, leader election, and tunable consistency.
+    </p>
+
+    <div class="badges">
+        <img src="https://img.shields.io/badge/Language-Python-blue">
+        <img src="https://img.shields.io/badge/Status-Active-success">
+    </div>
+</header>
+
+<main>
+
+<section>
+    <h2>Overview</h2>
+    <p>
+        NodeSync is a Python-based distributed key-value store that demonstrates 
+	core distributed systems concepts such as leader-based replication, 
+	heartbeat-driven failure detection, and dynamic consistency selection.
+    </p>
+</section>
+
+<section>
+    <h2>🚀 Features</h2>
+
+    <ul>
+        <li>Distributed key-value storage using TCP sockets</li>
+        <li>Multi-node replication</li>
+        <li>Heartbeat-based liveness monitoring</li>
+        <li>Runtime consistency switching</li>
+        <li>Eventual and strong (quorum-based) consistency</li>
+        <li>Concurrent client handling using threads</li>
+        <li>Leader election (Raft-lite)</li>
+        <li>Automatic request forwarding to leader</li>
+        <li>Automatic leader re-election on node failure</li>
+    </ul>
+
+</section>
+
+<section>
+    <h2>🏗 Architecture Overview</h2>
+
+    <div class="tree">
+Client
+|
+v
+Follower Node ----> Leader Node ----> Peer Nodes
+_____________________________/
+Replication
+    </div>
+    <div class="nav">
+      <a href="architecture.html">Architecture</a>
+    </div>
+
+    <p>Leader election is deterministic:</p>
+    <p>➡️ the alive node with the highest port number becomes leader</p>
+</section>
+
+<section>
+    <h2>🚀 Running the System</h2>
+    <h3>Start 3 nodes (example)</h3>
+
+    <pre><code>python nodes/node.py 5000 127.0.0.1:5001 127.0.0.1:5002
+python nodes/node.py 5001 127.0.0.1:5000 127.0.0.1:5002
+python nodes/node.py 5002 127.0.0.1:5000 127.0.0.1:5001</code></pre>
+
+    <p>The node with the highest port becomes leader.</p>
+    <h3>🧪 Client Interaction (PowerShell Example)</h3>
+    <pre><code>$client = New-Object System.Net.Sockets.TcpClient("127.0.0.1", 5002)
+$stream = $client.GetStream()
+$writer = New-Object System.IO.StreamWriter($stream)
+$reader = New-Object System.IO.StreamReader($stream)
+$writer.AutoFlush = $true
+
+$writer.WriteLine("SET hello world")
+$reader.ReadLine()
+
+$writer.WriteLine("GET hello")
+$reader.ReadLine()</code></pre>
+
+</section>
+
+<section>
+    <h2>Consistency Modes</h2>
+    <p>NodeSync supports runtime-switchable consistency models, allowing experimentation with CAP trade-offs.</p>
+
+    <pre><code>CONSISTENCY eventual
+CONSISTENCY strong</code></pre>
+
+    <ul>
+        <li>Eventual: low latency, asynchronous replication</li>
+        <li>Strong: quorum-based replication before ACK</li>
+    </ul>
+    <p>if quorum cannot be reached in strong mode, the write fails with:</p>
+    <pre><code>FAIL: quorum not reached</code></pre>
+    <p>This enables direct comparison of consistency-performance trade-offs.</p>
+
+</section>
+
+<section>
+    <h2>Fault Tolerance</h2>
+    <p>
+        Node failures are detected using missed heartbeats. 
+	When a leader fails, a new leader is automatically elected, 
+	allowing the system to continue operating.
+    </p>
+</section>
+
+<section>
+    <h2>📊 Performance Benchmarking</h2>
+    <p>NodeSync was benchmarked under both eventual and strong consistency modes.</p>
+    <p>
+	Results show that quorum-based strong consistency 
+	increases write latency due to replica acknowledgements, 
+	while eventual consistency provides lower latency.
+    </p>
+    <h3>CLI Results:</h3>
+    <pre><code>python benchmark/benchmark.py</code></pre>
+
+    <pre><code>[Benchmark] Running Eventual Consistency test...
+[Benchmark] Running Strong Consistency test...
+
+======== RESULTS ========
+
+Eventual Consistency:
+  Avg latency: 0.0139s
+  Max latency: 0.0371s
+
+Strong Consistency:
+  Avg latency: 0.0153s
+  Max latency: 0.0429s</code></pre>
+
+</section>
+
+<section>
+    <h2>📌 Future Improvements</h2>
+    <ul>
+        <li>Persistent write-ahead logs</li>
+        <li>Strong consistency using Raft log replication</li>
+        <li>Sharding and partitioning</li>
+        <li>Client library abstraction</li>
+    </ul>
+</section>
+
+<section>
+    <h2>📚 Why NodeSync?</h2>
+    <p>
+        NodeSync bridges theoretical concepts such as CAP theorem and 
+	quorum consensus with practical implementation, 
+	making it suitable for academic evaluation and experimentation.
+    </p>
+</section>
+
+</main>
+
+<footer>
+    Built for academic demonstration, Key Concepts Demonstration - Distributed Systems, and engineering portfolios.
+</footer>
+
+</body>
+</html>
