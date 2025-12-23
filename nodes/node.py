@@ -131,7 +131,7 @@ class NodeServer:
 
         new_leader = max(alive)
         if new_leader != self.leader_id:
-            print(f"[{'ELECTION':<8}] New leader elected: {new_leader}")
+            print(f"[{'ELECTION':<10}] New leader elected: {new_leader}")
         self.leader_id = new_leader
 
     def get_leader_address(self):
@@ -156,11 +156,11 @@ class NodeServer:
                     sock.close()
 
                     if not self.peer_status.get(peer, True):
-                        print(f"[{'RECOVERED':<8}] Peer {peer} is back UP")
+                        print(f"[{'RECOVERED':<10}] Peer {peer} is back UP")
                     self.peer_status[peer] = True
                 except:
                     if self.peer_status.get(peer, True):
-                        print(f"[{'FAILURE':<8}] Peer {peer} is DOWN")
+                        print(f"[{'FAILURE':<10}] Peer {peer} is DOWN")
                     self.peer_status[peer] = False
 
             self.elect_leader()
@@ -173,8 +173,8 @@ class NodeServer:
         server.bind((self.host, self.port))
         server.listen()
 
-        print(f"[{'NodeSync':<8}] Node {self.node_id} running on {self.host}:{self.port}")
-        print(f"[{'NodeSync':<8}] Peers: {self.peers}")
+        print(f"[{'NodeSync':<10}] Node {self.node_id} running on {self.host}:{self.port}")
+        print(f"[{'NodeSync':<10}] Peers: {self.peers}")
 
         threading.Thread(
             target=self.heartbeat_monitor, daemon=True
