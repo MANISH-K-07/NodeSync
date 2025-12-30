@@ -1,10 +1,10 @@
+# NodeSync
+
 ![Python](https://img.shields.io/badge/language-Python-blue)
 ![Distributed Systems](https://img.shields.io/badge/domain-Distributed%20Systems-purple)
 ![Fault Tolerance](https://img.shields.io/badge/focus-Fault%20Tolerance-darkgreen)
 ![License](https://img.shields.io/badge/license-MIT-lightgrey)
 [![GitHub Pages](https://img.shields.io/badge/demo-GitHub%20Pages-brightgreen)](https://manish-k-07.github.io/NodeSync/)
-
-# NodeSync
 
 NodeSync is a fault-tolerant distributed key-value store built in Python that demonstrates core distributed systems concepts including replication, leader election, failure detection, and automatic failover.
 
